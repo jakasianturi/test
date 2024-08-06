@@ -14,8 +14,8 @@ if (!isset($_SESSION['user_id'])) {
         </a>
         <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false"><?= $_SESSION['name']; ?></button>
-            <div class="dropdown-menu">
-                <a type="button" class="dropdown-item" data-toggle="modal" data-target="#updateUserModal">Update Profile</a>
+            <div class="dropdown-menu dropdown-menu-right p-3">
+                <a type="button" class="dropdown-item mb-2" data-toggle="modal" data-target="#updateUserModal">Update Profile</a>
                 <a type="button" href="<?= BASE_URL; ?>/modules/auth/logout.php" id="logoutButton" class="btn btn-danger d-block">Log Out</a>
             </div>
         </div>
