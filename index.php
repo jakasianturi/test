@@ -1,7 +1,7 @@
 <?php
 session_start();
-include 'config/app.php';
-include 'config/database.php';
+require __DIR__ . '/config/app.php';
+require __DIR__ . '/config/database.php';
 
 if (isset($_SESSION['user_id'])) {
     if ($_SESSION['user_role'] == "admin") {
@@ -15,38 +15,38 @@ if (isset($_SESSION['user_id'])) {
 ?>
 
 <?php
-include 'includes/header.php';
+require __DIR__ . '/includes/header.php';
 ?>
-<main class="main">
+<main class="d-flex justify-content-center align-items-center w-100" style="margin: 0 auto; min-height: 100vh">
 
     <!-- Login Area -->
 
     <div class="login-container">
         <?php
-            $message = "";
+        $message = "";
+        $alert = "success";
+        $show_alert = false;
+        if (isset($_SESSION['login_error'])) {
+            $message = $_SESSION['login_error'];
+            $alert = "danger";
+            $show_alert = true;
+            unset($_SESSION['login_error']);
+        } else if (isset($_SESSION['register_user_success'])) {
+            $message = $_SESSION['register_user_success'];
             $alert = "success";
-            $show_alert = false;
-            if (isset($_SESSION['login_error'])) {
-                $message = $_SESSION['login_error'];
-                $alert = "danger";
-                $show_alert = true;
-                unset($_SESSION['login_error']);
-            } else if (isset($_SESSION['register_user_success'])) {
-                $message = $_SESSION['register_user_success'];
-                $alert = "success";
-                $show_alert = true;
-                unset($_SESSION['register_user_success']);
-            } else if (isset($_SESSION['register_user_exists'])) {
-                $message = $_SESSION['register_user_exists'];
-                $alert = "danger";
-                $show_alert = true;
-                unset($_SESSION['register_user_exists']);
-            } else if (isset($_SESSION['register_errors'])) {
-                $message = $_SESSION['register_errors'];
-                $alert = "danger";
-                $show_alert = true;
-                unset($_SESSION['register_errors']);
-            }
+            $show_alert = true;
+            unset($_SESSION['register_user_success']);
+        } else if (isset($_SESSION['register_user_exists'])) {
+            $message = $_SESSION['register_user_exists'];
+            $alert = "danger";
+            $show_alert = true;
+            unset($_SESSION['register_user_exists']);
+        } else if (isset($_SESSION['register_errors'])) {
+            $message = $_SESSION['register_errors'];
+            $alert = "danger";
+            $show_alert = true;
+            unset($_SESSION['register_errors']);
+        }
         ?>
         <div class="login-form" id="loginForm" style="display: flex; flex-direction: column; align-items: center;">
             <?php if ($show_alert) { ?>
@@ -148,5 +148,5 @@ include 'includes/header.php';
     </script>
 
     <?php
-    include 'includes/footer.php';
+    require __DIR__ . '/includes/footer.php';
     ?>

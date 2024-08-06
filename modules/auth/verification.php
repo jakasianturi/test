@@ -1,5 +1,7 @@
 <?php
 session_start();
+
+require __DIR__ . '/../../vendor/autoload.php';
 require __DIR__ . '/../../config/app.php';
 require __DIR__ . '/../../config/database.php';
 require __DIR__ . '/../../includes/functions.php';
@@ -7,29 +9,39 @@ require __DIR__ . '/../../includes/functions.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = sanitizeInput($_POST['username']);
     $verification_code = $_POST['verification_code'];
-}
 
-if (!empty($verification_code)) {
-    $stmt = $conn->prepare("SELECT `id`, `name`, `email` FROM `tbl_user` WHERE `username` = :username and `verification_code` = :verification_code");
-    $stmt->execute(['username' => $user_id, 'verification_code' => $verification_code]);
+    if (!empty($verification_code)) {
+        $stmt = $conn->prepare("SELECT `id`, `name`, `email` FROM `tbl_user` WHERE `username` = :username and `verification_code` = :verification_code");
+        $stmt->execute(['username' => $username, 'verification_code' => $verification_code]);
+    
+        $check_user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $check_user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!empty($check_user)) {
-        $stmt = $conn->prepare("UPDATE `tbl_user` SET `verification_code` = NULL WHERE `username` = :username");
-        $stmt->execute(['username' => $username]);
-
-        $_SESSION['user_verified'] = true;
-        header("Location: " . BASE_URL . "/modules/user/index.php");
-        exit();
+        if (!empty($check_user)) {
+            $stmt = $conn->prepare("UPDATE `tbl_user` SET `verification_code` = NULL WHERE `username` = :username");
+            $stmt->execute(['username' => $username]);
+    
+            $_SESSION['user_verified'] = true;
+            header("Location: " . BASE_URL . "/modules/user/index.php");
+            exit();
+        } else {
+            $_SESSION['verification_error'] = "Invalid verification code";
+            header("Location: " . BASE_URL . "/modules/auth/verification.php");
+            exit();
+        }
     } else {
-        $_SESSION['verification_error'] = "Invalid verification code";
-        header("Location: " . BASE_URL . "/modules/auth/login.php");
+        $_SESSION['verification_error'] = "Please enter verification code";
+        header("Location: " . BASE_URL . "/modules/auth/verification.php");
         exit();
     }
 }
 
+if (!isset($_SESSION['user_verified'])) {
+    header("Location: " . BASE_URL . "");
+    exit();
+}
+
 ?>
+
 <?php
 require __DIR__ . '/../../includes/header.php';
 ?>
@@ -55,9 +67,16 @@ require __DIR__ . '/../../includes/header.php';
             <h2 class="text-center">Verification OTP</h2>
             <p class="text-center">Please ask the admin for a verification code.</p>
             <form action="<?= BASE_URL; ?>/modules/auth/verification.php" method="POST">
-                <input type="text" class="form-control text-center mb-3" name="username" placeholder="Username" value="<?= $username ?>">
-                <input type="number" class="form-control text-center" id="verification_code" placeholder="Verification Code" name="verification_code">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" class="form-control" id="username" name="username" value="<?= $username ?>">
+                </div>
+                <div class="form-group">
+                    <label for="verification_code">Verification Code:</label>
+                    <input type="number" class="form-control" id="verification_code" name="verification_code">
+                </div>
                 <button type="submit" class="btn btn-secondary login-btn form-control mt-4" name="verify">Verify</button>
+                <a href="<?= BASE_URL; ?>/modules/auth/logout.php" type="button" class="btn btn-danger login-btn form-control mt-2" name="logout">Logout</a>
             </form>
         </div>
 
@@ -65,5 +84,5 @@ require __DIR__ . '/../../includes/header.php';
 
 </div>
 <?php
-require __DIR__ . '\includes\footer.php';
+require __DIR__ . '/../../includes/footer.php';
 ?>

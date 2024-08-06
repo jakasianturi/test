@@ -1,12 +1,14 @@
 <?php
 session_start();
-require __DIR__ . '../../config/app.php';
-require __DIR__ . '../../config/database.php';
-require __DIR__ . '../../includes/functions.php';
-require __DIR__ . "../../libs/aes.php";
+require __DIR__ . '/../../config/app.php';
+require __DIR__ . '/../../config/database.php';
+require __DIR__ . '/../../includes/functions.php';
+require __DIR__ . '/../../libs/aes.php';
 
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if($_SERVER["REQUEST_METHOD"] != "POST") {
+    header("Location: " . BASE_URL . "");
+    exit();
+} else if($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = sanitizeInput($_POST['username']);
     $password = $_POST['password'];
 

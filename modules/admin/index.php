@@ -5,12 +5,12 @@ require __DIR__ . '/../../config/database.php';
 require __DIR__ . '/../../includes/functions.php';
 require __DIR__ . '/../../libs/aes.php';
 
-if (!isset($_SESSION['user_verified'])) {
-    if(!isset($_SESSION['user_id'])) {
-        header("Location: ".BASE_URL."");
+if (!isset($_SESSION['user_id'])) {
+    if ($_SESSION['role'] != "admin") {
+        header("Location: " . BASE_URL . "/modules/user/index.php");
         exit();
     }
-    header("Location: ".BASE_URL."/modules/auth/verification.php");
+    header("Location: " . BASE_URL . "");
     exit();
 }
 
@@ -25,7 +25,7 @@ require __DIR__ . '/../../includes/navbar.php';
 ?>
 
 <?php
-require __DIR__ . '/../../modules/user/home.php';
+require __DIR__ . '/../../modules/admin/home.php';
 ?>
 
 <?php
