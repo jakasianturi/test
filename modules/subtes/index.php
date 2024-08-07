@@ -37,6 +37,39 @@ if (!empty($data_jawaban)) {
     $jawaban = $data_jawaban['jawaban'];
 }
 
+// timer
+$check_start_time = $conn->prepare("SELECT `start_time` FROM `tbl_user` WHERE `id` = :id");
+$check_start_time->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_INT);
+$check_start_time->execute();
+$check_start_time = $check_start_time->fetch(PDO::FETCH_ASSOC);
+
+// Set timezone to Asia/Jakarta
+date_default_timezone_set('Asia/Jakarta');
+$start_time = date('Y-m-d H:i:s');
+
+// Cek apakah user sudah memulai tes
+if (empty($check_start_time['start_time'])) {
+
+    $stmt_insert_time = $conn->prepare("UPDATE `tbl_user` SET `start_time` = :start_time WHERE `id` = :id");
+    $stmt_insert_time->bindParam(':start_time', $start_time, PDO::PARAM_STR);
+    $stmt_insert_time->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt_insert_time->execute();
+} else {
+    $start_time = $check_start_time['start_time'];
+}
+
+// timer
+$time_left = 0;
+$waktu_masuk = strtotime($start_time);
+$current_time = time();
+$time_elapsed = $current_time - $waktu_masuk;
+$total_time = 20; // 3 x 60 detik
+$time_left = $total_time - $time_elapsed; // sisa waktu dalam detik
+
+if ($time_left <= 0) {
+    header("Location: " . BASE_URL . "/modules/user/index.php");
+    exit();
+}
 ?>
 
 <?php
@@ -51,6 +84,9 @@ require __DIR__ . '/../../includes/navbar.php';
     <div class="row" style="width: 100%; display:flex; justify-content:center;">
         <div class="col-md-3">
             <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Timer : <span id="timer"></span></h5>
+                </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-center mb-3" style="gap: 10px;">
                         <a id="1" class="btn btn-primary nomor" href="<?= BASE_URL ?>/modules/subtes/index.php?id=1" style="width: 10rem;height: 4rem; display: flex;justify-content: center;align-items: center; background-color: #cfe4ff;">1</a>
@@ -164,8 +200,45 @@ require __DIR__ . '/../../includes/footer.php';
 ?>
 
 <script type="text/javascript">
+    var timeLeft = <?= $time_left; ?>;
+
+    function updateTimer() {
+        var minutes = Math.floor(timeLeft / 60);
+        var seconds = timeLeft % 60;
+
+        var formattedMinutes = ('0' + minutes).slice(-2);
+        var formattedSeconds = ('0' + seconds).slice(-2);
+
+        document.getElementById('timer').innerText = formattedMinutes + ":" + formattedSeconds;
+
+        if (timeLeft <= 0) {
+            $.ajax({
+                url: "<?= BASE_URL ?>/modules/subtes/finish.php",
+                type: "POST",
+                success: function(response) {
+                    alert('Waktu habis!');
+                    console.log(response);
+                    window.location.href = "<?= BASE_URL ?>/modules/user/index.php";
+                }
+            })
+        } else {
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateTimer();
+    });
+
     document.getElementById('confirmFinish').addEventListener('click', function() {
-        window.location.href = "<?= BASE_URL ?>/modules/user/index.php";
+        $.ajax({
+            url: "<?= BASE_URL ?>/modules/subtes/finish.php",
+            type: "POST",
+            success: function(response) {
+                console.log(response);
+            }
+        })
     });
     $(document).ready(function() {
         const buttons = document.querySelectorAll('.answer-btn');
@@ -214,9 +287,8 @@ require __DIR__ . '/../../includes/footer.php';
             }
         });
 
-        $('#confirmFinish').on('click', function(e) {
+        $('#finish').on('click', function(e) {
             e.preventDefault();
-            var url = "<?= BASE_URL ?>/modules/user/index.php";
 
             if (selectedAnswerId) {
                 $.ajax({
@@ -228,7 +300,6 @@ require __DIR__ . '/../../includes/footer.php';
                     },
                     success: function(response) {
                         console.log(response);
-                        window.location.href = url;
                     },
                     error: function(xhr, status, error) {
                         console.error(xhr);

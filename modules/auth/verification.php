@@ -17,7 +17,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $check_user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!empty($check_user)) {
-            $stmt = $conn->prepare("UPDATE `tbl_user` SET `verification_code` = NULL WHERE `username` = :username");
+            $verification_code = rand(100000, 999999);
+            $stmt = $conn->prepare("UPDATE `tbl_user` SET `verification_code` = $verification_code WHERE `username` = :username");
             $stmt->execute(['username' => $username]);
     
             $_SESSION['user_verified'] = true;
@@ -35,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-if (!isset($_SESSION['user_verified'])) {
+if (isset($_SESSION['user_verified']) && $_SESSION['user_verified'] == true) {
     header("Location: " . BASE_URL . "");
     exit();
 }
@@ -46,7 +47,7 @@ if (!isset($_SESSION['user_verified'])) {
 require __DIR__ . '/../../includes/header.php';
 ?>
 <div class="main">
-    <div class="verification-container">
+    <div class="d-flex justify-content-center align-items-center w-100 " style="height: 100vh">
         <div class="verification-form" id="loginForm">
             <?php
             $message = "";
@@ -69,7 +70,7 @@ require __DIR__ . '/../../includes/header.php';
             <form action="<?= BASE_URL; ?>/modules/auth/verification.php" method="POST">
                 <div class="form-group">
                     <label for="username">Username:</label>
-                    <input type="text" class="form-control" id="username" name="username" value="<?= $username ?>">
+                    <input type="text" class="form-control" id="username" name="username" value="<?= $_SESSION['username']; ?>">
                 </div>
                 <div class="form-group">
                     <label for="verification_code">Verification Code:</label>

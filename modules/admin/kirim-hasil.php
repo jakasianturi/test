@@ -6,6 +6,7 @@ require __DIR__ . '/../../config/app.php';
 require __DIR__ . '/../../config/database.php';
 require __DIR__ . '/../../includes/functions.php';
 require __DIR__ . '/../../libs/aes.php';
+require __DIR__ . '/../../libs/aesctr.php';
 
 
 use Dompdf\Dompdf;
@@ -16,7 +17,7 @@ use PHPMailer\PHPMailer\Exception;
 $user_id = $_POST['user_id'];
 
 // Ambil data pengguna
-$stmt = $conn->prepare("SELECT * FROM `tbl_user` WHERE `id` = :id");
+$stmt = $conn->prepare("SELECT * FROM `tbl_user` WHERE `id` = :id LIMIT 1");
 $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $data_user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -41,7 +42,10 @@ if ($simpan_hasil_pdf['status']) {
         // Kirim hasil ke user
         $kirim_hasil_user = kirimHasilUser($data_user, $enkripsi_file_pdf['data']);
         if ($kirim_hasil_user['status']) {
-            echo "<script>alert('Berhasil ke kirim'); window.location.href = 'hasil.php?id=" . $user_id . "';</script>";
+            echo "<script>
+                    alert('Berhasil ke kirim');
+                    window.location.href = '" . BASE_URL . "/modules/admin/cek-hasil.php?id=" . $user_id . "';
+            </script>";
         }
     }
 }
@@ -95,8 +99,7 @@ function enkripsiFilePDF($data_user, $pathFileAsli)
 {
     $key = $data_user['verification_code'];
     $namaFile = file_get_contents(dirname(dirname(__DIR__)) . "/uploads/before-enkrip/$pathFileAsli");
-    $aes = new Aes($namaFile, $key, 128);
-    $encFile = $aes->encrypt($data_user['password']);
+    $encFile = AesCtr::encrypt($namaFile, $key, 128);
     $waktu_sekarang = str_replace(':', '-', date('Y-m-d H:i:s'));
     $file_name = $data_user['username'] . '-' . $waktu_sekarang . '-encrypt.pdf';
     $enkrip = file_put_contents(dirname(dirname(__DIR__)) . "/uploads/after-enkrip/" . $file_name, $encFile);

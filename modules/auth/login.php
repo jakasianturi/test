@@ -4,6 +4,7 @@ require __DIR__ . '/../../config/app.php';
 require __DIR__ . '/../../config/database.php';
 require __DIR__ . '/../../includes/functions.php';
 require __DIR__ . '/../../libs/aes.php';
+require __DIR__ . '/../../libs/AesBase.php';
 
 if($_SERVER["REQUEST_METHOD"] != "POST") {
     header("Location: " . BASE_URL . "");
@@ -26,7 +27,7 @@ if($_SERVER["REQUEST_METHOD"] != "POST") {
         // Memverifikasi password
         // Enkripsi password untuk membandingkan dengan yang tersimpan di database
         $io = substr(md5($password), 0, 16);
-        $aes = new Aes($io);
+        $aes = new AesBase($io);
         $hasil = bin2hex($aes->encrypt($password));
         
         if (($hasil) === $user_password) {

@@ -26,7 +26,7 @@ require __DIR__ . '/../../includes/navbar.php';
 <div class="d-flex justify-content-center align-items-center w-100" style="margin: 40px auto; min-height: 80vh;">
     <div class="content p-4">
         <h2>HASIL PEMERIKSAAN PSIKOLOGIS CFIT</h2>
-        <table>
+        <table class="table table-borderless">
             <?php
             $id = $_GET['id'];
             $stmt = $conn->prepare("SELECT * FROM `tbl_user` WHERE `id` = :id");
@@ -118,7 +118,7 @@ require __DIR__ . '/../../includes/navbar.php';
         $nilai_bulat = round($nilai_persen);
         // Tampilkan hasil nilai
 
-        echo '<p style="font-size: 2rem; color: black;">Nilai: ' . $nilai_bulat . '</p>';
+        echo '<p style="font-size: 2rem; color: white;">Nilai: ' . $nilai_bulat . '</p>';
         ?>
         <form method="POST" action="<?= BASE_URL; ?>/modules/admin/kirim-hasil.php">
             <input type="hidden" name="user_id" value="<?= $user['id'] ?>">

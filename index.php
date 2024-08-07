@@ -4,7 +4,7 @@ require __DIR__ . '/config/app.php';
 require __DIR__ . '/config/database.php';
 
 if (isset($_SESSION['user_id'])) {
-    if ($_SESSION['user_role'] == "admin") {
+    if ($_SESSION['role'] == "admin") {
         header("Location: " . BASE_URL . "/modules/admin/index.php");
         exit();
     }
@@ -23,30 +23,30 @@ require __DIR__ . '/includes/header.php';
 
     <div class="login-container">
         <?php
-        $message = "";
-        $alert = "success";
-        $show_alert = false;
-        if (isset($_SESSION['login_error'])) {
-            $message = $_SESSION['login_error'];
-            $alert = "danger";
-            $show_alert = true;
-            unset($_SESSION['login_error']);
-        } else if (isset($_SESSION['register_user_success'])) {
-            $message = $_SESSION['register_user_success'];
+            $message = "";
             $alert = "success";
-            $show_alert = true;
-            unset($_SESSION['register_user_success']);
-        } else if (isset($_SESSION['register_user_exists'])) {
-            $message = $_SESSION['register_user_exists'];
-            $alert = "danger";
-            $show_alert = true;
-            unset($_SESSION['register_user_exists']);
-        } else if (isset($_SESSION['register_errors'])) {
-            $message = $_SESSION['register_errors'];
-            $alert = "danger";
-            $show_alert = true;
-            unset($_SESSION['register_errors']);
-        }
+            $show_alert = false;
+            if (isset($_SESSION['login_error'])) {
+                $message = $_SESSION['login_error'];
+                $alert = "danger";
+                $show_alert = true;
+                unset($_SESSION['login_error']);
+            } else if (isset($_SESSION['register_user_success'])) {
+                $message = $_SESSION['register_user_success'];
+                $alert = "success";
+                $show_alert = true;
+                unset($_SESSION['register_user_success']);
+            } else if (isset($_SESSION['register_user_exists'])) {
+                $message = $_SESSION['register_user_exists'];
+                $alert = "danger";
+                $show_alert = true;
+                unset($_SESSION['register_user_exists']);
+            } else if (isset($_SESSION['register_errors'])) {
+                $message = $_SESSION['register_errors'];
+                $alert = "danger";
+                $show_alert = true;
+                unset($_SESSION['register_errors']);
+            }
         ?>
         <div class="login-form" id="loginForm" style="display: flex; flex-direction: column; align-items: center;">
             <?php if ($show_alert) { ?>
@@ -70,7 +70,7 @@ require __DIR__ . '/includes/header.php';
                 <button type="submit" class="btn btn-secondary login-btn form-control">Login</button>
                 <br />
                 <p id="register">No Account? Register <span style="color:black;" class="switch-form-link-register" onclick="showRegistrationForm()">Here.</span></p>
-                <p>Membuka Hasil ujian <a href="<?= BASE_URL; ?>/modules/test/decrypt.php" style="color:black;">Here.</a></p>
+                <p>Membuka Hasil ujian <a href="<?= BASE_URL; ?>/decrypt-form.php" style="color:black;">Here.</a></p>
 
             </form>
         </div>

@@ -6,19 +6,15 @@ require __DIR__ . '/../../config/database.php';
 require __DIR__ . '/../../includes/functions.php';
 
 if (!isset($_SESSION['user_id'])) {
-    if ($_SESSION['role'] != "admin") {
-        header("Location: " . BASE_URL . "/modules/user/index.php");
-        exit();
-    }
     header("Location: " . BASE_URL . "");
     exit();
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id = $_POST['id'];
-    $stmt = $conn->prepare("DELETE FROM `tbl_user` WHERE `id` = :id");
-    $stmt->bindParam(':id', $id);
+    $user_id = $_SESSION['user_id'];
+    $stmt = $conn->prepare("UPDATE `tbl_user` SET `finish_test` = 1 WHERE `id` = :id");
+    $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
     $stmt->execute();
-
-    echo "success";
+    header("Location: " . BASE_URL . "/modules/subtes/index.php");
+    exit();
 }

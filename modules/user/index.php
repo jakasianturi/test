@@ -5,7 +5,7 @@ require __DIR__ . '/../../config/database.php';
 require __DIR__ . '/../../includes/functions.php';
 require __DIR__ . '/../../libs/aes.php';
 
-if (!isset($_SESSION['user_verified'])) {
+if (!isset($_SESSION['user_verified']) && $_SESSION['user_id'] != true) {
     if(!isset($_SESSION['user_id'])) {
         header("Location: ".BASE_URL."");
         exit();
