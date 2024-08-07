@@ -32,8 +32,8 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
     $password = empty($pass_encrypt) ? $data['password'] : $pass_encrypt;
 
     if (!empty($_SESSION['user_id'])) {
-        $stmt = $conn->prepare("UPDATE `tbl_user` SET `name` = :name, `email` = :email, `contact_number` = :contact_number, `password` = :password WHERE `id` = :id");
-        $stmt->execute(['name' => $name, 'email' => $email, 'contact_number' => $contact_number, 'password' => $pass_encrypt, 'id' => $_SESSION['user_id']]);
+        $stmt = $conn->prepare("UPDATE `tbl_user` SET `name` = :name, `email` = :email, `contact_number` = :contact_number, `password` = :password, `username` = :username WHERE `id` = :id");
+        $stmt->execute(['name' => $name, 'email' => $email, 'contact_number' => $contact_number, 'password' => $password, 'username' => $username, 'id' => $_SESSION['user_id']]);
         if ($stmt->rowCount() > 0) {
             $_SESSION['update_profile_success'] = "Profile updated successfully";
             header("Location: " . BASE_URL . "");
